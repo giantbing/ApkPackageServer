@@ -5,14 +5,17 @@ import com.giantbing.apkpackage.Utils.FileUtils
 import com.giantbing.apkpackage.Response.RestResponseBody
 import com.giantbing.apkpackage.Service.ApkOrderService
 import com.giantbing.apkpackage.Service.MediaService
+import com.giantbing.apkpackage.Service.SignService
 import com.giantbing.apkpackage.logger
 import com.giantbing.apkpackage.model.ApkHadleOrder
+import com.giantbing.apkpackage.model.SignInfo
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.http.server.reactive.ServerHttpResponse
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Mono
+import reactor.core.publisher.toMono
 import java.nio.file.Paths
 import java.io.*
 import java.nio.file.Files
@@ -26,9 +29,11 @@ class MainControler {
     @Autowired
     private lateinit var apkOrderService: ApkOrderService
     @Autowired
-    private lateinit var mediaService:MediaService
+    private lateinit var mediaService: MediaService
+    @Autowired
+    private lateinit var signService: SignService
 
-    @PostMapping("/postApk", consumes = ["multipart/form-data"])
+    @PostMapping("/post-apk", consumes = ["multipart/form-data"])
     @ResponseBody
     fun postApk(@RequestPart("file") file: FilePart): Mono<RestResponseBody<ApkHadleOrder>> {
 
@@ -48,7 +53,7 @@ class MainControler {
 
         return apkOrderService.saveOneOrder(path.toFile())
 
-//         RestResponseBody<Unit>().isSuccess(true).setMsg("上传成功").toMono()
+
     }
 
     @GetMapping("/download", params = ["id"])
@@ -59,6 +64,36 @@ class MainControler {
             return@flatMap FileUtils.downloadFile(response, it.filePath)
         }
 
+    }
+
+    @PostMapping("upload-sign")
+    fun uploadSign(@RequestPart("file") file: FilePart, @RequestParam id: String, @RequestParam alias: String, @RequestParam pwd: String, @RequestParam aliasPwd: String): Mono<RestResponseBody<Unit>> {
+
+        //  val tempFile = Files.createTempFile("temp", file.filename())
+        val path = Paths.get(Const.SIGNPATH + file.filename())
+        file.transferTo(path)
+        return mediaService.saveMedia(path = path.toFile().absolutePath)
+                .flatMap { media ->
+                    signService.saveOne(SignInfo(media, alias, pwd, aliasPwd))
+                }.flatMap { sign ->
+                    apkOrderService.addSignOrder(id, sign)
+                }.flatMap {
+                    RestResponseBody<Unit>().toMono()
+                }
+    }
+
+    @PostMapping("upload-channel")
+    fun uploadChannel(@RequestPart("file") file: FilePart, @RequestParam id: String): Mono<RestResponseBody<Unit>> {
+
+        //  val tempFile = Files.createTempFile("temp", file.filename())
+        val path = Paths.get(Const.SIGNPATH + file.filename())
+        file.transferTo(path)
+        return mediaService.saveMedia(path = path.toFile().absolutePath)
+                .flatMap { media ->
+                    apkOrderService.addChannel(id, media)
+                }.flatMap {
+                    RestResponseBody<Unit>().toMono()
+                }
     }
 
 }

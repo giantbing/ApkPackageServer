@@ -4,6 +4,8 @@ import com.giantbing.apkpackage.Utils.ApkCheackUtil
 import com.giantbing.apkpackage.Response.RestResponseBody
 import com.giantbing.apkpackage.model.ApkHadleOrder
 import com.giantbing.apkpackage.model.ApkState
+import com.giantbing.apkpackage.model.MediaInfo
+import com.giantbing.apkpackage.model.SignInfo
 import com.giantbing.apkpackage.repository.ApkInfoRepository
 import com.giantbing.apkpackage.repository.ApkOrderRepository
 import com.giantbing.apkpackage.repository.MediaRepository
@@ -57,11 +59,30 @@ class ApkOrderService {
 
     }
 
-    fun isHasOrder(file: File): Boolean {
-        val apkInfo = ApkCheackUtil.getApkInfo(file) ?: return true
-
-        return false
+    fun updateOrder(order: ApkHadleOrder): Mono<ApkHadleOrder> {
+        return apkOrderRepository.save(order)
     }
+
+    fun addSignOrder(id: String, sign: SignInfo): Mono<ApkHadleOrder> {
+        return getOneById(id).flatMap {
+            val order = it
+            it.signInfo = sign
+            updateOrder(order)
+        }
+    }
+
+    fun addChannel(id: String, channel: MediaInfo): Mono<ApkHadleOrder> {
+        return getOneById(id).flatMap {
+            val order = it
+            it.channelFile = channel
+            updateOrder(order)
+        }
+    }
+
+    fun getOneById(id: String): Mono<ApkHadleOrder> {
+        return apkOrderRepository.findById(id)
+    }
+
 
 }
 

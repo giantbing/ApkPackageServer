@@ -14,4 +14,8 @@ class MediaService {
     fun getMediaById(id:String):Mono<MediaInfo>{
         return mediaRepository.findById(id)
     }
+
+    fun saveMedia(path:String):Mono<MediaInfo>{
+        return mediaRepository.save(MediaInfo(path))
+    }
 }
