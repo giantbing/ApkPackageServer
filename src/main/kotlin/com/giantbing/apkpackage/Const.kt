@@ -13,6 +13,8 @@ object Const {
     val OUTCHANNELPATH:String="${OUTPath}channels/"
 
     fun init() {
+        val file0 = File(ROOTPATH)
+        if (!file0.exists()) file0.mkdir()
         val file = File(UPLOADPATH)
         if (!file.exists()) file.mkdir()
         val file1 = File(ICONPATH)

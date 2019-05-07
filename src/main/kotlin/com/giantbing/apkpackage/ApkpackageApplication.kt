@@ -7,12 +7,14 @@ import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories
 import org.springframework.util.ResourceUtils
 import java.io.File
 import java.nio.file.Files
 import java.util.logging.Logger
 
 @SpringBootApplication
+@EnableMongoRepositories
 class ApkpackageApplication : ApplicationRunner {
     @Value("\${jiagu.path}")
     private lateinit var jiaguPath: String
@@ -25,7 +27,7 @@ class ApkpackageApplication : ApplicationRunner {
 
         Const.init()
         ApkCheackUtil.setPathValue(File(Const.ROOTPATH + jiaguPath).absolutePath, jiaguUser, jiaguPwd)
-        ApkCheackUtil.testCmd()
+        //ApkCheackUtil.testCmd()
     }
 }
 

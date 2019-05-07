@@ -18,7 +18,7 @@ data class ApkHadleOrder(
         val id: String? = null)
 
 enum class ApkState {
-    INIT, ERROR, HANDLE
+    INIT, ERROR, HANDLE,SUCCESS
 }
 
 
