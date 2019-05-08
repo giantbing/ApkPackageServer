@@ -25,11 +25,14 @@ class ApkpackageApplication : ApplicationRunner {
     private lateinit var jiaguUser: String
     @Value("\${jiagu.pwd}")
     private lateinit var jiaguPwd: String
+    @Value("\${giantbing.docker}")
+    private lateinit var appName:String
 
     override fun run(args: ApplicationArguments?) {
-
+        logger.error(Const.ROOTPATH)
+        logger.error("appName:{}",appName)
         Const.init()
-        ApkCheackUtil.setPathValue(File(Const.ROOTPATH + jiaguPath).absolutePath, jiaguUser, jiaguPwd)
+        ApkCheackUtil.setPathValue(File(Const.JIAGUROOTPATH + jiaguPath).absolutePath, jiaguUser, jiaguPwd)
         //ApkCheackUtil.testCmd()
     }
 }

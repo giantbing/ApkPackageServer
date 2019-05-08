@@ -7,7 +7,8 @@ import java.io.File
 object Const {
     //ApplicationHome(this::class.java)
     //val ROOTPATH: String = ApplicationHome(ApkpackageApplication::class.java).source.parentFile.absolutePath + "/upload/"
-    val ROOTPATH: String = ResourceUtils.getFile(ResourceUtils.CLASSPATH_URL_PREFIX).absolutePath + "/upload/"
+    val ROOTPATH: String = ResourceUtils.getFile(ResourceUtils.FILE_URL_PREFIX).absolutePath + "spring/upload/"
+    val JIAGUROOTPATH: String = ResourceUtils.getFile(ResourceUtils.FILE_URL_PREFIX).absolutePath + "spring/"
     val UPLOADPATH: String = "${ROOTPATH}apk/"
     val ICONPATH: String = "${ROOTPATH}icon/"
     val CHANNELSPATH: String = "${ROOTPATH}channel/"
