@@ -1,9 +1,12 @@
 package com.giantbing.apkpackage
 
+import org.springframework.boot.system.ApplicationHome
 import org.springframework.util.ResourceUtils
 import java.io.File
 
 object Const {
+    //ApplicationHome(this::class.java)
+    //val ROOTPATH: String = ApplicationHome(ApkpackageApplication::class.java).source.parentFile.absolutePath + "/upload/"
     val ROOTPATH: String = ResourceUtils.getFile(ResourceUtils.CLASSPATH_URL_PREFIX).absolutePath + "/upload/"
     val UPLOADPATH: String = "${ROOTPATH}apk/"
     val ICONPATH: String = "${ROOTPATH}icon/"

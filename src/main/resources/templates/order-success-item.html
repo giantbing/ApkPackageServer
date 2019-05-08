@@ -35,7 +35,26 @@
     </dl>
 </div>
 <div>
-    <div class="text-c pd-20" id="qrcode"></div>
+    <div class="text-c pd-10">
+        <a class="btn btn-primary radius"  th:href="@{/apk/download(id=${orderItem.channelZip.id})}"><i class="Hui-iconfont">&#xe641;</i> 打包下载</a>
+    </div>
+    <div class="text-c pd-20">
+        <table class="table table-border table-bordered table-bg table-hover table-sort">
+            <thead>
+            <tr class="text-c">
+                <!--<th width="40"><input name="" type="checkbox" value=""></th>-->
+                <th width="80">渠道列表</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="text-c" th:each="channel : ${orderItem.channelList}">
+                <!--<td><input name="" type="checkbox" value=""></td>-->
+                <td class="text-id"><a class="maincolor" th:href="@{/apk/download(id=${channel.id})}"
+                                       th:text="${ channel.fileName}">001</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 <!--_footer 作为公共模版分离出去-->
 <script type="text/javascript" src="lib/jquery/1.9.1/jquery.min.js"></script>
@@ -48,9 +67,9 @@
 <!--请在下方写此页面业务相关的脚本-->
 
 <script type="text/javascript" th:inline="javascript">
-    var apkId = /*[[${orderItem.info.filePath.id}]]*/;
-    var apkUrl = 'http://' + window.location.host + '/apk/download?id='+apkId;
-    new QRCode(document.getElementById("qrcode"), apkUrl);
+    // var apkId = /*[[${orderItem.info.filePath.id}]]*/;
+    // var apkUrl = 'http://' + window.location.host + '/apk/download?id='+apkId;
+    // new QRCode(document.getElementById("qrcode"), apkUrl);
 </script>
 
 </body>

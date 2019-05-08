@@ -2,12 +2,17 @@ package com.giantbing.apkpackage.Utils
 
 import com.giantbing.apkpackage.Const
 import com.giantbing.apkpackage.logger
+import com.giantbing.apkpackage.model.ApkHadleOrder
 import com.giantbing.apkpackage.model.ApkInfo
 import com.giantbing.apkpackage.model.MediaInfo
 import net.dongliu.apk.parser.ApkFile
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.core.publisher.toFlux
+import reactor.core.publisher.toMono
 import reactor.core.scheduler.Schedulers
 import java.io.File
+import java.lang.IllegalArgumentException
 import java.nio.file.Files
 
 //用于检查 apk 等包信息
@@ -26,61 +31,74 @@ object ApkCheackUtil {
     private val jiaguLoginCmd: String by lazy {
         "java -jar $jiaguPath -login $jiaguUser $jiaguPwd"
     }
-    private val jiaguSignCmd: String by lazy {
-        "java -jar $jiaguPath -importsign ${Const.SIGNPATH}potato.jks 123123 key0 123123"
+
+
+    private fun getJiaguSignCmd(apk: ApkHadleOrder): String {
+
+        return "java -jar $jiaguPath -importsign ${apk.signInfo!!.signPath.filePath} ${apk.signInfo!!.pwd} ${apk.signInfo!!.alias} ${apk.signInfo!!.aliasPwd}"
     }
-//    private val jiaguCmd: String by lazy {
-//        "java -jar $jiaguPath -jiagu /Users/giantbing/Downloads/apkpackage/target/classes/upload/apk/app-armeabi-v7a-debug.apk ${Const.OUTPath} -autosign"
-//    }
 
-
-    private fun getjiaguCmd(): String {
-        val outPath = "${Const.OUTPath}potato_1/"
+    //存储 加固好的包的位置
+    private fun getjiaguCmd(apk: ApkHadleOrder): String {
+        val outPath = "${Const.OUTPath}${apk.id}/"
         File(outPath).mkdir()
-        return "java -jar $jiaguPath -jiagu /Users/giantbing/Downloads/apkpackage/target/classes/upload/apk/app-armeabi-v7a-debug.apk $outPath -autosign"
+        return "java -jar $jiaguPath -jiagu ${apk.info.filePath.filePath} $outPath -autosign"
     }
 
 
-    private fun getVasDollyCmd(): Mono<Pair<Boolean, String?>> {
+    private fun getVasDollyCmd(apk: ApkHadleOrder): Mono<Pair<Boolean, String?>> {
 
-        val jiaguApkPath = File("${Const.OUTPath}potato_1/")
+        val jiaguApkPath = File("${Const.OUTPath}${apk.id}/")
         var jiaguApk: File? = null
-        jiaguApkPath.listFiles().toMutableList().forEach {
-            if ("apk".equals(it.extension, true)) {
-                jiaguApk = it
-                return@forEach
-            }
-        }
-        if (jiaguApk != null && jiaguApk!!.exists()) {
-            val jiaguChannelPath = "${Const.OUTCHANNELPATH}potato_1/"
-            return Mono.just(Pair(true, "java -jar $vasDollyPath put -c ${Const.CHANNELSPATH}channel.txt -f ${jiaguApk!!.absolutePath} $jiaguChannelPath"))
+        val apkList = FileUtils.findAllApkFile(jiaguApkPath)
+        if (apkList.isNotEmpty()) jiaguApk = apkList[0]
+
+        if (jiaguApk != null && jiaguApk.exists()) {
+            val jiaguChannelPath = "${Const.OUTCHANNELPATH}${apk.id}/"
+            File(jiaguChannelPath).mkdir()
+            return Mono.just(Pair(true, "java -jar $vasDollyPath put -c ${apk.channelFile!!.filePath} -f ${jiaguApk.absolutePath} $jiaguChannelPath"))
         }
         return Mono.just(Pair(false, null))
     }
 
-    fun testCmd() {
-        cmdCreat(jiaguLoginCmd)
-                .flatMap {
-                    cmdCreat(jiaguSignCmd)
-                }
-                .flatMap {
-                    cmdCreat(getjiaguCmd())
-                }.flatMap {
-                    getVasDollyCmd()
-                }.flatMap {
-                    if (!it.first) {
-                        Mono.just(1)
-                    } else {
-                        cmdCreat(it.second!!)
-                    }
-                }
-                .subscribeOn(Schedulers.newSingle("cmd"))
-                .subscribe {
-                    logger.error("resualt{}", it)
-                }
+    private fun getJiaguApk(apk: ApkHadleOrder): String? {
+        val jiaguApkPath = File("${Const.OUTPath}${apk.id}/")
+        var jiaguApk: File? = null
+        val apkList = FileUtils.findAllApkFile(jiaguApkPath)
+        if (apkList.isNotEmpty()) jiaguApk = apkList[0]
 
+        return jiaguApk?.absolutePath
+    }
+
+    fun handleApk(apk: ApkHadleOrder): Flux<File> {
+        return cmdCreat(jiaguLoginCmd).flatMap {
+            if (it > 0) throw IllegalArgumentException()
+            cmdCreat(getJiaguSignCmd(apk))
+        }.flatMap {
+            if (it > 0) throw IllegalArgumentException()
+            cmdCreat(getjiaguCmd(apk))
+        }.flatMap {
+            if (it > 0) throw IllegalArgumentException()
+            getVasDollyCmd(apk)
+        }.flatMap {
+            if (!it.first) {
+                Mono.just(1)
+                throw IllegalArgumentException()
+            } else {
+                cmdCreat(it.second!!)
+            }
+        }.flatMapMany {
+            return@flatMapMany Flux.fromIterable(FileUtils.findAllApkFile(File("${Const.OUTCHANNELPATH}${apk.id}/")))
+        }.subscribeOn(Schedulers.newSingle("cmd"))
+                .doOnComplete {
+                    //删掉加固的包
+                    val jiaguApk = File(getJiaguApk(apk))
+                    if (jiaguApk.exists()) jiaguApk.delete()
+                    FileUtils.deleteDir(File("${Const.OUTPath}${apk.id}/"))
+                }
 
     }
+
 
     private fun cmdCreat(cmd: String): Mono<Int> {
         return Mono.create<Int> {
@@ -89,10 +107,6 @@ object ApkCheackUtil {
             val process = runtime.exec(cmd)
             it.success(process.waitFor())
         }
-    }
-
-    fun handleApk(file: File) {
-
     }
 
 
@@ -115,7 +129,7 @@ object ApkCheackUtil {
                     apkMeta.versionCode.toString(),
                     apkMeta.versionName,
                     apkMeta.packageName,
-                    MediaInfo(iconPath), MediaInfo(filePath = file.absolutePath))
+                    MediaInfo(iconPath, File(iconPath).name), MediaInfo(filePath = file.absolutePath, fileName = file.name))
             apkParser.close()
             return apkinfo
 

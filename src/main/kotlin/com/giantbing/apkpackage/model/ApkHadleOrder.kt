@@ -8,17 +8,18 @@ import java.util.*
 data class ApkHadleOrder(
 
         val info: ApkInfo,
-        val state: ApkState,
+        var state: ApkState,
         val createTime: Date,
-        val updateTime: Date,
-        var channelList: MutableList<ApkInfo>,
+        var updateTime: Date,
+        var channelList: MutableList<MediaInfo>,
+        var channelZip: MediaInfo? = null,
         var signInfo: SignInfo? = null,
         var channelFile: MediaInfo? = null,
         @Id
         val id: String? = null)
 
 enum class ApkState {
-    INIT, ERROR, HANDLE,SUCCESS
+    INIT, ERROR, HANDLE, SUCCESS
 }
 
 

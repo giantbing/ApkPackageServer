@@ -71,16 +71,31 @@
 
 
                 <td class="td-manage">
+                    <a th:if="${order.state.name()=='INIT' && (order.channelFile == null || order.signInfo == null )}"
+                       style="text-decoration:none" onclick="add_info(this)"
+                       href="javascript:;"
+                       title="补充信息">
+                        <i class="Hui-iconfont">&#xe645;</i>
+                    </a>
+                    <a th:if="${order.state.name()=='SUCCESS'}" style="text-decoration:none"
+                       onclick="order_success_show(this)"
+                       href="javascript:;"
+                       title="详细信息">
+                        <i class="Hui-iconfont">&#xe725;</i>
+                    </a>
                     <a th:if="${order.state.name()=='INIT'}" style="text-decoration:none" onclick="order_show(this)"
                        href="javascript:;"
                        title="详细信息">
                         <i class="Hui-iconfont">&#xe725;</i>
                     </a>
-                    <a th:if="${order.state.name()=='INIT'}" style="text-decoration:none" class="ml-5"
+                    <a th:if="${order.state.name()=='INIT' && (order.channelFile != null && order.signInfo != null )}"
+                       style="text-decoration:none" class="ml-5"
+                       onclick="start_order(this)"
                        href="javascript:;" title="执行打包">
                         <i class="Hui-iconfont">&#xe6e6;</i>
                     </a>
-                    <a style="text-decoration:none" class="ml-5" onClick="picture_del(this,'10001')"
+                    <a th:if="${order.state.name()!='HANDLE'}" style="text-decoration:none" class="ml-5"
+                       onClick="delete_order(this)"
                        href="javascript:;" title="删除">
                         <i class="Hui-iconfont">&#xe6e2;</i>
                     </a>
@@ -114,18 +129,21 @@
         layer.full(index);
     }
 
-    /*图片-查看*/
-    function picture_show(title, url, id) {
+    /*添加信息*/
+    function add_info(obj) {
+        var id = $(obj).parents("tr").find(".text-id").html();
+        var url = '/add-order-info?id=' + id;
         var index = layer.open({
             type: 2,
-            title: title,
+            title: '添加信息',
             content: url
         });
         layer.full(index);
     }
+
     /*添加信息*/
     function redirect(id) {
-        var url = '/add-order-info?id='+id;
+        var url = '/add-order-info?id=' + id;
         console.log(url);
         var index = layer.open({
             type: 2,
@@ -134,34 +152,74 @@
         });
         layer.full(index);
     }
+
     /*查看信息-二维码页面，具体分析*/
     function order_show(obj) {
-     var id =   $(obj).parents("tr").find(".text-id").html();
-        var url = '/get-order?id='+id ;
+        var id = $(obj).parents("tr").find(".text-id").html();
+        var url = '/get-order?id=' + id;
         var w = '360';
-        var h = '400';
+        var h = '500';
         console.log(url);
         layer_show('查看APK信息', url, w, h);
     }
 
+    //成功后的查看页面
+    function order_success_show(obj) {
+        var id = $(obj).parents("tr").find(".text-id").html();
+        var url = '/get-order-success?id=' + id;
 
-    // /*图片-删除*/
-    // function picture_del(obj, id) {
-    //     layer.confirm('确认要删除吗？', function (index) {
-    //         $.ajax({
-    //             type: 'POST',
-    //             url: '',
-    //             dataType: 'json',
-    //             success: function (data) {
-    //                 $(obj).parents("tr").remove();
-    //                 layer.msg('已删除!', {icon: 1, time: 1000});
-    //             },
-    //             error: function (data) {
-    //                 console.log(data.msg);
-    //             },
-    //         });
-    //     });
-    // }
+        layer_show('查看APK信息', url, '500', '500');
+    }
+
+    //开始打包
+    function start_order(obj) {
+        var id = $(obj).parents("tr").find(".text-id").html();
+        var url = '/apk/start-sign?id=' + id;
+        layer.confirm('确定要开始吗？', function (index) {
+            $.ajax({
+                type: 'GET',
+                url: url,
+                success: function (data) {
+                    if (data.success) {
+                        layer.msg('开启成功！');
+                        location.reload()
+                    } else {
+                        layer.msg('开启失败！' + data.msg);
+                        location.reload()
+                    }
+
+                },
+                error: function (data) {
+                    console.log(data.msg);
+                    layer.msg('开启失败！');
+                }
+            });
+        });
+    }
+
+    function delete_order(obj) {
+        var id = $(obj).parents("tr").find(".text-id").html();
+        var url = '/apk/order-delete?id=' + id;
+        layer.confirm('确定要删除吗？', function (index) {
+            $.ajax({
+                type: 'GET',
+                url: url,
+                success: function (data) {
+                    if (data.success) {
+                        layer.msg('删除成功！');
+                        location.reload()
+                    } else {
+                        layer.msg('删除失败！' + data.msg);
+                    }
+
+                },
+                error: function (data) {
+                    console.log(data.msg);
+                    layer.msg('删除失败！');
+                }
+            });
+        });
+    }
 </script>
 </body>
 </html>

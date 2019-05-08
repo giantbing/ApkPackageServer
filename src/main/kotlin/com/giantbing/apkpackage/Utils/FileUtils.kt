@@ -16,7 +16,7 @@ object FileUtils {
         val fileName = file.name
         val zeroCopyResponse = response as ZeroCopyHttpOutputMessage
         response.getHeaders().set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=$fileName")
-        response.getHeaders().contentType = MediaType.IMAGE_PNG
+        //response.getHeaders().contentType = MediaType.ALL
 
 
         return zeroCopyResponse.writeWith(file, 0, file.length())
@@ -40,7 +40,34 @@ object FileUtils {
         return "apk".equals(file.extension, true)
     }
 
+    fun findAllApkFile(path: File): MutableList<File> {
+        val list = mutableListOf<File>()
+        path.listFiles().toMutableList().forEach {
+            if ("apk".equals(it.extension, true)) {
+                list.add(it)
+            }
+        }
+        return list
+    }
 
+    fun doDeleteEmptyDir(dir: String) {
+        val success = File(dir).delete()
+        if (success) {
+            println("Successfully deleted empty directory: $dir")
+        } else {
+            println("Failed to delete empty directory: $dir")
+        }
+    }
+
+    fun deleteDir(dir: File) {
+        if (dir.isDirectory) {
+            val children = dir.list()
+            children.forEachIndexed { index, s ->
+                deleteDir(File(dir, children[index]))
+            }
+        }
+        dir.delete()
+    }
 }
 
 val MultipartFile.extension: String?

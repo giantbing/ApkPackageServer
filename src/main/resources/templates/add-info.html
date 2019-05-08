@@ -38,22 +38,24 @@
     </div>
 </div>
 <div class="pd-10 text-c">
-    <input class="btn btn-primary size-XL radius" id="sign" disabled="disabled" onclick="sign_add('添加任务','index.html')"
-           href="javascript:;" type="button" value="上传签名文件">
+    <a class="btn btn-primary size-XL radius" onclick="sign_add(this)" href="javascript:;">上传签名文件</a>
     <i class="Hui-iconfont" id="sign-tip" hidden="hidden">&#xe6a7;</i>
+    <i class="Hui-iconfont" th:if="${orderItem.signInfo != null}">&#xe6a7;</i>
 </div>
 <div class="pd-10 text-c">
-    <form id="form-channel" th:action="'/apk/upload-channel/'+${orderItem.id}" method="post" enctype="multipart/form-data">
+    <form id="form-channel" th:action="'/apk/upload-channel/'+${orderItem.id}" method="post"
+          enctype="multipart/form-data">
        <span class="btn-upload">
         <a href="javascript:void();" class="btn btn-primary radius btn-upload"><i class="Hui-iconfont">&#xe642;</i> 浏览文件</a>
          <input class="btn btn-primary  radius input-file" id="channel" type="file" multiple name="file" value="上传渠道文件">
         </span>
 
-        <input class="btn btn-primary size-XL radius" type="submit" value="上传">
+        <input class="btn btn-primary  radius" type="submit" value="上传">
+
+        <i class="Hui-iconfont" th:if="${orderItem.channelFile != null}">&#xe6a7;</i>
         <i class="Hui-iconfont" id="channel-tip" hidden="hidden">&#xe6a7;</i>
     </form>
 </div>
-
 
 
 <script type="text/javascript" src="lib/jquery/1.9.1/jquery.min.js"></script>
@@ -63,33 +65,48 @@
 <script type="text/javascript" src="lib/jquery.validation/1.14.0/messages_zh.js"></script>
 <script type="text/javascript" src="static/h-ui/js/H-ui.min.js"></script>
 <script type="text/javascript" src="static/h-ui.admin/js/H-ui.admin.js"></script>
-<script>
-    function sign_add(title, url) {
-        var index = layer.open({
-            type: 2,
-            title: title,
-            content: url
-        });
-        layer.full(index);
+<script type="text/javascript" th:inline="javascript">
+    var data = /*[[${orderItem}]]*/;
+    var isSignSuccess = data.signInfo != null;
+    var isChannelSuccess = data.channelFile != null;
+
+    function sign_add(obj) {
+        var id = /*[[${orderItem.id}]]*/;
+        var url = '/add-sign-info?id=' + id;
+
+        layer_show('添加签名', url, '700', '500');
+
     }
 
-    function channel_add(title, url) {
-        alert("别他妈再点了")
+    function sign_success() {
+        isSignSuccess = true;
+        $("#sign-tip").show();
+        checkUpload();
     }
+
+    function checkUpload() {
+        if (isSignSuccess && isChannelSuccess) {
+            alert("信息已上传");
+            window.parent.location.reload();
+        }
+    }
+
 
     $(function () {
         var options = {
             success: function (data) {
-                if (data.success){
-                    console.log(data);
+                if (data.success) {
+                    isChannelSuccess = true;
                     $("#channel").text(data.data);
-                    $("#channel-tip").show()
+                    $("#channel-tip").show();
+                    checkUpload();
                 } else {
                     alert(data.msg)
                 }
                 $("#responseText").text(data);
-            },error:function (data) {
-                alert(data)
+            }, error: function (data) {
+                alert(data);
+                console.log(data);
             }
         };
         $("#form-channel").ajaxForm(options);

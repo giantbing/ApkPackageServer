@@ -5,6 +5,7 @@ import com.giantbing.apkpackage.repository.MediaRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
+import java.io.File
 
 @Service
 class MediaService {
@@ -16,6 +17,6 @@ class MediaService {
     }
 
     fun saveMedia(path:String):Mono<MediaInfo>{
-        return mediaRepository.save(MediaInfo(path))
+        return mediaRepository.save(MediaInfo(path,File(path).name))
     }
 }
