@@ -1,5 +1,5 @@
 # ApkPackageServer
-360加固+vasdolly
+360加固+vasdolly [docker地址](https://hub.docker.com/r/giantbing/apkpackage)
 # 说明：
 1. 介绍：一个为Android应用加固并打渠道包的SpringBoot后台应用,之前在AS中写过一个buildTask进行该操作，但是由于360加固区分了平台，以及平台之间的差异性，导致不好管理、并且打出来后用U盘传输效率低下，故此有了这个服务器。
 2. 技术摘要：[springboot](https://spring.io/projects/spring-boot) 、webflux 、netty 、[ProjectReactor](https://projectreactor.io/)、kotlin 、Reactive MongoDB 、[360加固](https://jiagu.360.cn/x)、[H ui前端框架免费版](http://www.h-ui.net/) 、[qrcodejs](https://github.com/davidshimjs/qrcodejs) 、[VasDolly](https://github.com/Tencent/VasDolly)、[Thymeleaf](https://www.thymeleaf.org/documentation.html)、docker、[dockerfile-maven-plugin](https://github.com/spotify/docker-maven-plugin)
