@@ -33,9 +33,8 @@ class ApkpackageApplication : ApplicationRunner {
 
     override fun run(args: ApplicationArguments?) {
         Const.init(jiaguPrefix)
-        logger.error(jiaguPrefix)
-        logger.error(Const.ROOTPATH)
-        logger.error("appName:{}",appName)
+        logger.info("rootpath:{}",Const.ROOTPATH)
+        logger.info("appName:{}",appName)
         ApkCheackUtil.setPathValue(File(Const.JIAGUROOTPATH + jiaguPath).absolutePath, jiaguUser, jiaguPwd)
         //ApkCheackUtil.testCmd()
     }
