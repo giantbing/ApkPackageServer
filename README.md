@@ -14,7 +14,7 @@
  - 如需修改您的360加固的位置（比如更新他的版本）：挂载在`/spring/`下的处`jiagu`路径外的任意配置中，并按照上一点客制化你的配置：`jiagu.path=your-path/`
  - 默认端口号：`8080`
  - mongodb端口号:`27017`
- - e.g：docker run --name apk -p 8080:8080 -v ~/docker_spring:/spring/upload  -d --link mongo:mongo giantbing/apkpackage:1.0`-v ~/docker_spring_conf:/spring/config`，并复制一份项目的application.properties到该目录中，并加以修改
+ - e.g：`docker run --name apk -p 8080:8080 -v ~/docker_spring:/spring/upload  -d --link mongo:mongo giantbing/apkpackage:1.0 -v ~/docker_spring_conf:/spring/config`，并复制一份项目的application.properties到该目录中，并加以修改
 # 本地Ide中debug运行
  1.在application.properties中配置了：`jiagu.path.prefix= /debug/` ，所以需要在项目根路径中有一个`debug`文件夹、将你的 加固的文件及 `VasDolly.jar` 放进该目录即可替换即可
 # 项目配置解析：
