@@ -2,7 +2,7 @@
 360加固+vasdolly
 # 说明：
 1. 介绍：一个为Android应用加固并打渠道包的SpringBoot后台应用,之前在AS中写过一个buildTask进行该操作，但是由于360加固区分了平台，以及平台之间的差异性，导致不好管理、并且打出来后用U盘传输效率低下，故此有了这个服务器。
-2. 技术摘要：[springboot](https://spring.io/projects/spring-boot) 、webflux 、netty 、[ProjectReactor](https://projectreactor.io/)、kotlin 、Reactive MongoDB 、[360加固](https://jiagu.360.cn/x)、[H ui前端框架免费版](http://www.h-ui.net/) 、[qrcodejs](https://github.com/davidshimjs/qrcodejs) 、[VasDolly](https://github.com/Tencent/VasDolly)、[Thymeleaf](https://www.thymeleaf.org/documentation.html)、docker
+2. 技术摘要：[springboot](https://spring.io/projects/spring-boot) 、webflux 、netty 、[ProjectReactor](https://projectreactor.io/)、kotlin 、Reactive MongoDB 、[360加固](https://jiagu.360.cn/x)、[H ui前端框架免费版](http://www.h-ui.net/) 、[qrcodejs](https://github.com/davidshimjs/qrcodejs) 、[VasDolly](https://github.com/Tencent/VasDolly)、[Thymeleaf](https://www.thymeleaf.org/documentation.html)、docker、[dockerfile-maven-plugin](https://github.com/spotify/docker-maven-plugin)
 3. 该后台作为 开发者->测试->产品 之间桥梁，开发人员传入 keystore 、密码、alias 、渠道txt文件后 可通知测试进行扫码下载，在测试完成后 开始执行加固打包命令 ，然后通知产品经理单独下载渠道文件或者直接下载所有文件的zip包。
 4. 目前仅支持 360加固 、VasDolly渠道 ，请确保您的包已经配置好VasDolly.
 5. 执行原理：利用360加固和VasDolly 的命令行指令进行 异步操作。
@@ -17,6 +17,14 @@
  - e.g：docker run --name apk -p 8080:8080 -v ~/docker_spring:/spring/upload  -d --link mongo:mongo giantbing/apkpackage:1.0`-v ~/docker_spring_conf:/spring/config`，并复制一份项目的application.properties到该目录中，并加以修改
 # 本地Ide中debug运行
  1.在application.properties中配置了：`jiagu.path.prefix= /debug/` ，所以需要在项目根路径中有一个`debug`文件夹、将你的 加固的文件及 `VasDolly.jar` 放进该目录即可替换即可
-# 项目配置路径解析：
+# 项目配置解析：
+ ```
+          spring.data.mongodb.uri=mongodb://giantbing:gb952400@localhost:27017/apk //mongodb 的配置
+          jiagu.path=jiagu/                                                        //加固路径
+          jiagu.user=your 360user                                                  //360加固账号
+          jiagu.pwd=your 360 pwd                                                   //360加固密码
+          jiagu.path.prefix= /debug/   or jiagu.path.prefix=/                      //upload路径的前缀 线上的可传/
+          giantbing.docker = debug                                                 //在运行时可以查看配置文件情况，只是一个TAG在运行时可以打印出来
+ ```
 # 启动命令：
 `docker run --name apk -p 8080:8080 -v ~/docker_spring:/spring/upload -v ~/docker_spring_conf:/spring/config -d --link mongo:mongo giantbing/apkpackage:1.0`
