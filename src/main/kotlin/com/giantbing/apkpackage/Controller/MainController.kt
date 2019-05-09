@@ -9,6 +9,7 @@ import com.giantbing.apkpackage.Service.MediaService
 import com.giantbing.apkpackage.Service.SignService
 import com.giantbing.apkpackage.Utils.ApkCheackUtil
 import com.giantbing.apkpackage.Utils.ZipUtils
+import com.giantbing.apkpackage.logger
 import com.giantbing.apkpackage.model.ApkHadleOrder
 import com.giantbing.apkpackage.model.ApkState
 import com.giantbing.apkpackage.model.MediaInfo
@@ -132,7 +133,7 @@ class MainController {
         return apkOrder.flatMap {
             if (it.channelFile != null && it.signInfo != null) {
                 it.updateTime = Date()
-                it.state=ApkState.HANDLE
+                it.state = ApkState.HANDLE
                 apkOrderService.updateOrder(it).subscribe()
                 handleApk(it)
                 return@flatMap RestResponseBody<Unit>().toMono()
@@ -144,10 +145,10 @@ class MainController {
     }
 
     //删除任务，默认会删除文件
-    @RequestMapping("/order-delete",params = ["id"])
+    @RequestMapping("/order-delete", params = ["id"])
     @ResponseBody
-    fun deleteOrder(@RequestParam id:String):Mono<RestResponseBody<Unit>>{
-      return  apkOrderService.deleteOrderById(id)
+    fun deleteOrder(@RequestParam id: String): Mono<RestResponseBody<Unit>> {
+        return apkOrderService.deleteOrderById(id)
     }
 
     private fun handleApk(apk: ApkHadleOrder) {
@@ -157,17 +158,20 @@ class MainController {
                 }
                 .collectList()
                 .flatMap {
-                    val apkOrder = apk.copy( updateTime = Date(), channelList = it)
+                    val apkOrder = apk.copy(updateTime = Date(), channelList = it)
                     apkOrderService.updateOrder(apkOrder)
                 }.flatMap {
-                    return@flatMap ZipUtils.reativeCompress("${Const.OUTCHANNELPATH}${apk.id}/","${Const.OUTCHANNELPATH}/${it.info.name}.zip")
+                    return@flatMap ZipUtils.reativeCompress("${Const.OUTCHANNELPATH}${apk.id}/", "${Const.OUTCHANNELPATH}${it.info.name}.zip")
                 }.flatMap {
                     if (!File(it).exists()) throw RuntimeException("未找到文件")
-                    return@flatMap mediaService.saveMedia(it)
+                    mediaService.saveMedia(it)
+                            .flatMap {
+                                apkOrderService.updateOrderZipFile(apk.id!!, it)
+                            }
                 }.flatMap {
-                    return@flatMap apkOrderService.updateOrderZipFile(apk.id!!,it)
-                }.flatMap {
-                    val apkOrder = apk.copy(state = ApkState.SUCCESS, updateTime = Date())
+
+                    val apkOrder = it.copy(state = ApkState.SUCCESS, updateTime = Date())
+                    logger.error("apkinfo:{}", apkOrder)
                     apkOrderService.updateOrder(apkOrder)
                 }
                 .doOnError {

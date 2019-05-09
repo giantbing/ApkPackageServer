@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk-alpine
+FROM openjdk:8-jdk
 EXPOSE 8080
 ARG JAR_FILE
 COPY docker/jiagu/ /spring/jiagu/
