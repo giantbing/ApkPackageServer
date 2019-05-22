@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement
 import org.springframework.util.ResourceUtils
 import java.io.File
 import java.nio.file.Files
+import java.util.*
 import java.util.logging.Logger
 
 @SpringBootApplication
@@ -32,6 +33,7 @@ class ApkpackageApplication : ApplicationRunner {
 
 
     override fun run(args: ApplicationArguments?) {
+        TimeZone.setDefault(TimeZone.getTimeZone("GMT+8:00"))
         Const.init(jiaguPrefix)
         logger.info("rootpath:{}",Const.ROOTPATH)
         logger.info("appName:{}",appName)

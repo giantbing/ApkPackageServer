@@ -52,7 +52,7 @@ class MainController {
         if (!FileUtils.isApkFile(tempFile.toFile())) {
             return Mono.just(RestResponseBody<ApkHadleOrder>().isSuccess(false).setMsg("请检查文件类型 apk"))
         }
-        val path = Paths.get(Const.UPLOADPATH + file.filename())
+        val path = Paths.get(Const.UPLOADPATH + Date().time+file.filename())
 
         file.transferTo(path)
 
@@ -93,14 +93,14 @@ class MainController {
                 }
     }
 
-    @PostMapping("/test")
-    @ResponseBody
-    fun test(@Valid @ModelAttribute request: SignRequest, errors: BindingResult): Mono<RestResponseBody<Unit>> {
-        if (errors.hasErrors()) {
-            return RestResponseBody<Unit>().isSuccess(false).setMsg(errors.toString()).toMono()
-        }
-        return RestResponseBody<Unit>().setMsg(request.toString()).toMono()
-    }
+//    @PostMapping("/test")
+//    @ResponseBody
+//    fun test(@Valid @ModelAttribute request: SignRequest, errors: BindingResult): Mono<RestResponseBody<Unit>> {
+//        if (errors.hasErrors()) {
+//            return RestResponseBody<Unit>().isSuccess(false).setMsg(errors.toString()).toMono()
+//        }
+//        return RestResponseBody<Unit>().setMsg(request.toString()).toMono()
+//    }
 
     @PostMapping("/upload-channel/{id}")
     @ResponseBody
@@ -161,7 +161,7 @@ class MainController {
                     val apkOrder = apk.copy(updateTime = Date(), channelList = it)
                     apkOrderService.updateOrder(apkOrder)
                 }.flatMap {
-                    return@flatMap ZipUtils.reativeCompress("${Const.OUTCHANNELPATH}${apk.id}/", "${Const.OUTCHANNELPATH}${it.info.name}.zip")
+                    return@flatMap ZipUtils.reativeCompress("${Const.OUTCHANNELPATH}${apk.id}/", "${Const.OUTCHANNELPATH}${it.info.packageName}.zip")
                 }.flatMap {
                     if (!File(it).exists()) throw RuntimeException("未找到文件")
                     mediaService.saveMedia(it)

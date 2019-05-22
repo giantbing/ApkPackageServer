@@ -58,7 +58,7 @@
                 <td th:text="${order.info.name}"></td>
                 <td class="text-l" th:text="${order.info.packageName}">现代简约 白色 餐厅</td>
                 <td class="text-c" th:text="${order.info.versionName}">标签</td>
-                <td th:text="${#dates.format(order.updateTime)}">2014-6-11 11:11:42</td>
+                <td th:text="${#dates.format(order.updateTime,'yyyy-MM-dd HH:mm:ss')}">2014-6-11 11:11:42</td>
 
                 <td class="td-status" th:if="${order.state.name()=='INIT'}"><span
                         class="label label-primary radius">已上传</span></td>
@@ -117,7 +117,15 @@
 <script type="text/javascript" src="lib/datatables/1.10.0/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="lib/laypage/1.2/laypage.js"></script>
 <script type="text/javascript">
-
+    /*<![CDATA[*/
+    $('.table-sort').dataTable({
+        "aaSorting": [
+            [5, "desc"]
+        ],//默认第几个排序
+        "bStateSave": true,//状态保存
+        "pading": false
+    });
+    /*]]>*/
 
     /*图片-添加*/
     function picture_add(title, url) {
