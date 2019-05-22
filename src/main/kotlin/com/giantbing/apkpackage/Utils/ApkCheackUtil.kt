@@ -89,7 +89,7 @@ object ApkCheackUtil {
             }
         }.flatMapMany {
             return@flatMapMany Flux.fromIterable(FileUtils.findAllApkFile(File("${Const.OUTCHANNELPATH}${apk.id}/")))
-        }.subscribeOn(Schedulers.newSingle("cmd"))
+        }.subscribeOn(Schedulers.elastic())
                 .doOnComplete {
                     //删掉加固的包
                     val jiaguApk = File(getJiaguApk(apk))
