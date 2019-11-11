@@ -77,8 +77,8 @@ require([ 'webuploader.flashonly' ], function( WebUploader ) {
             // server: 'http://liaoxuezhi.fe.baidu.com/webupload/fileupload.php',
             // server: 'http://www.2betop.net/fileupload.php',
             fileNumLimit: 300,
-            fileSizeLimit: 200 * 1024 * 1024,    // 200 M
-            fileSingleSizeLimit: 50 * 1024 * 1024    // 50 M
+            fileSizeLimit: 2000 * 1024 * 1024,    // 200 M
+            fileSingleSizeLimit: 1000 * 1024 * 1024    // 50 M
         });
 
         // 添加“添加文件”的按钮，

@@ -27,7 +27,7 @@ class ApkpackageApplication : ApplicationRunner {
     @Value("\${jiagu.pwd}")
     private lateinit var jiaguPwd: String
     @Value("\${giantbing.docker}")
-    private lateinit var appName:String
+    private lateinit var appName: String
     @Value("\${jiagu.path.prefix}")
     private lateinit var jiaguPrefix: String
 
@@ -35,11 +35,13 @@ class ApkpackageApplication : ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
         TimeZone.setDefault(TimeZone.getTimeZone("GMT+8:00"))
         Const.init(jiaguPrefix)
-        logger.info("rootpath:{}",Const.ROOTPATH)
-        logger.info("appName:{}",appName)
+        logger.info("rootpath:{}", Const.ROOTPATH)
+        logger.info("appName:{}", appName)
         ApkCheackUtil.setPathValue(File(Const.JIAGUROOTPATH + jiaguPath).absolutePath, jiaguUser, jiaguPwd)
         //ApkCheackUtil.testCmd()
     }
+
+
 }
 
 fun main(args: Array<String>) {

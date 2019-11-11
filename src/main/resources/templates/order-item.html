@@ -49,7 +49,7 @@
 
 <script type="text/javascript" th:inline="javascript">
     var apkId = /*[[${orderItem.info.filePath.id}]]*/;
-    var apkUrl = 'http://' + window.location.host + '/apk/download?id='+apkId;
+    var apkUrl = 'https://' + window.location.host + '/apk/download?id='+apkId;
     new QRCode(document.getElementById("qrcode"), apkUrl);
 </script>
 

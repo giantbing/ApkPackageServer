@@ -4,5 +4,5 @@ WORKDIR /spring
 ARG JAR_FILE
 COPY docker/jiagu/ /spring/jiagu/
 COPY docker/application.properties /spring/application.properties
-ADD target/${JAR_FILE} /spring.jar
-ENTRYPOINT ["java", "-jar","/spring.jar"]
+ADD target/${JAR_FILE} /spring/jar/spring.jar
+ENTRYPOINT ["java", "-jar","/spring/jar/spring.jar"]
