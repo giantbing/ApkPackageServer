@@ -19,7 +19,7 @@
  1.在application.properties中配置了：`jiagu.path.prefix= /debug/` ，所以需要在项目根路径中有一个`debug`文件夹、将你的 加固的文件及 `VasDolly.jar` 放进该目录即可替换即可
 # 项目配置解析：
  ```
-          spring.data.mongodb.uri=mongodb://giantbing:gb952400@localhost:27017/apk //mongodb 的配置
+          spring.data.mongodb.uri=mongodb://giantbing:******00@localhost:27017/apk //mongodb 的配置
           jiagu.path=jiagu/                                                        //加固路径
           jiagu.user=your 360user                                                  //360加固账号
           jiagu.pwd=your 360 pwd                                                   //360加固密码
